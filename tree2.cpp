@@ -1,6 +1,6 @@
 //A port of libxml2's tree2 example to fisherro::libxml2
 #include <sstream>
-#include "fisherro_libxml2.hpp"
+#include "libxml2.hpp"
 
 namespace xml = fisherro::libxml2;
 

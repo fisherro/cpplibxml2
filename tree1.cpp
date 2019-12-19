@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 
-#include "fisherro_libxml2.hpp"
+#include "libxml2.hpp"
 
 namespace xml = fisherro::libxml2;
 
