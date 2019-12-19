@@ -12,17 +12,21 @@
 
 namespace xpp {
 
-    using doc = xmlDoc;
+    using doc  = xmlDoc;
     using node = xmlNode;
-    using dtd = xmlDtd;
-    using ns = xmlNs;
+    using dtd  = xmlDtd;
+    using ns   = xmlNs;
+    using attr = xmlAttr;
 
-    using u_doc_ptr = std::unique_ptr<doc, decltype(&xmlFreeDoc)>;
-    using u_node_ptr = std::unique_ptr<node, decltype(&xmlFreeNode)>;
+    struct doc_deleter  { void operator()(doc* p)  { xmlFreeDoc(p);  }};
+    struct node_deleter { void operator()(node* p) { xmlFreeNode(p); }};
+
+    using u_doc_ptr = std::unique_ptr<doc, doc_deleter>;
+    using u_node_ptr = std::unique_ptr<node, node_deleter>;
 
     u_doc_ptr read_file(zstring_view path)
     {
-        return u_doc_ptr(xmlReadFile(path.c_str(), nullptr, 0), &xmlFreeDoc);
+        return u_doc_ptr{xmlReadFile(path.c_str(), nullptr, 0)};
     }
 
     //Would there ever be a reason to have a raw doc pointer?
@@ -87,13 +91,25 @@ namespace xpp {
 
     u_doc_ptr new_doc(zstring_view version)
     {
-        return u_doc_ptr{xmlNewDoc(BAD_CAST version.c_str()), &xmlFreeDoc};
+        return u_doc_ptr{xmlNewDoc(BAD_CAST version.c_str())};
+    }
+
+    u_node_ptr new_node(zstring_view name)
+    {
+        return u_node_ptr{xmlNewNode(nullptr, BAD_CAST name.c_str())};
+    }
+
+    attr* new_prop(node* node, zstring_view name, zstring_view value)
+    {
+        return xmlNewProp(node, BAD_CAST name.c_str(), BAD_CAST value.c_str());
+    }
+
+    u_node_ptr new_text(zstring_view content)
+    {
+        return u_node_ptr{xmlNewText(BAD_CAST content.c_str())};
     }
 };
 #if 0
-xpp::new_node
-xpp::new_prop
-xpp::new_text
 xpp::save_format_file_enc
 xpp::set_root_element
 #endif
