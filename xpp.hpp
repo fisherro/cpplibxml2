@@ -50,10 +50,13 @@ namespace xpp {
     node* add_child(node* parent, u_node_ptr child)
     {
         //TODO: If an error occurs, is child freed?
-        node* result { xmlAddChild(parent, child.get()) };
-        //Ownership has been handed over
-        child.release();
+        node* result { xmlAddChild(parent, child.release()) };
         return result;
+    }
+
+    node* add_child(u_node_ptr& parent, u_node_ptr child)
+    {
+        return add_child(parent.get(), std::move(child));
     }
 
     dtd* create_int_subset(
@@ -108,8 +111,25 @@ namespace xpp {
     {
         return u_node_ptr{xmlNewText(BAD_CAST content.c_str())};
     }
+
+    //Returns the OLD root node!
+    u_node_ptr set_root_element(u_doc_ptr& doc, u_node_ptr root)
+    {
+        //TODO: Is root freed on error?
+        u_node_ptr old{xmlDocSetRootElement(doc.get(), root.release())};
+        return old;
+    }
+
+    int save_format_file_enc(
+            zstring_view filename,
+            u_doc_ptr& doc,
+            std::optional<zstring_view> encoding,
+            bool format = true)
+    {
+        return xmlSaveFormatFileEnc(
+                filename.c_str(),
+                doc.get(),
+                encoding? encoding->c_str(): nullptr,
+                format);
+    }
 };
-#if 0
-xpp::save_format_file_enc
-xpp::set_root_element
-#endif
