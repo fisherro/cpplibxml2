@@ -2,7 +2,11 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 #include <string>
+
+#include "zstring_view.hpp"
+
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
@@ -11,11 +15,12 @@ namespace xpp {
     using doc = xmlDoc;
     using node = xmlNode;
     using dtd = xmlDtd;
+    using ns = xmlNs;
 
     using u_doc_ptr = std::unique_ptr<doc, decltype(&xmlFreeDoc)>;
     using u_node_ptr = std::unique_ptr<node, decltype(&xmlFreeNode)>;
 
-    u_doc_ptr read_file(const std::string& path)
+    u_doc_ptr read_file(zstring_view path)
     {
         return u_doc_ptr(xmlReadFile(path.c_str(), nullptr, 0), &xmlFreeDoc);
     }
@@ -47,45 +52,42 @@ namespace xpp {
         return result;
     }
 
-    dtd* create_int_subset(u_doc_ptr& doc, const std::string& name,
-            const std::string& external_id, const std::string& system_id)
+    dtd* create_int_subset(
+            u_doc_ptr& doc,
+            zstring_view name, 
+            std::optional<zstring_view> external_id,
+            zstring_view system_id)
     {
         return xmlCreateIntSubset(
                 doc.get(),
-                name.c_str(),
-                external_id.empty()? nullptr: external_id.c_str(),
-                system_id.c_str());
+                BAD_CAST name.c_str(),
+                external_id? BAD_CAST external_id->c_str(): nullptr,
+                BAD_CAST system_id.c_str());
     }
 
-    //std::optional references aren't OK, right?
-    //Something like std::string_view that takes NUL-terminated strings would
-    //be handy
     node* new_child_internal(
             node* parent,
             ns* ns,
-            const std::string& name,
-            const std::string* content)
+            zstring_view name,
+            std::optional<zstring_view> content)
     {
-        return xmlNewChild(parent, ns, name.c_str(),
-                content? content->c_str(): nullptr);
+        return xmlNewChild(parent, ns, BAD_CAST name.c_str(),
+                content? BAD_CAST content->c_str(): nullptr);
     }
 
-    node* new_child(node* parent, const std::string& name)
+    node* new_child(node* parent, zstring_view name)
     {
-        return new_child_internal(parent, nullptr, name, nullptr);
+        return new_child_internal(parent, nullptr, name, std::nullopt);
     }
 
-    node* new_child(
-            node* parent,
-            const std::string& name,
-            const std::string& content)
+    node* new_child(node* parent, zstring_view name, zstring_view content)
     {
-        return new_child_internal(parent, nullptr, name, &content);
+        return new_child_internal(parent, nullptr, name, content);
     }
 
-    u_doc_ptr new_doc(const std::string& version)
+    u_doc_ptr new_doc(zstring_view version)
     {
-        return u_doc_ptr{xmlNewDoc(version.c_str()), &xmlFreeDoc};
+        return u_doc_ptr{xmlNewDoc(BAD_CAST version.c_str()), &xmlFreeDoc};
     }
 };
 #if 0

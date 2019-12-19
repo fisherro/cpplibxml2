@@ -9,7 +9,7 @@ int main(int argc, const char** argv)
     //TODO: Needs to take ownership of root
     //      Or have a single call that does new_node and set_root_element
     xpp::set_root_element(doc, root);
-    xpp::create_int_subset(doc, "root", nullptr, "tree2.dtd");
+    xpp::create_int_subset(doc, "root", std::nullopt, "tree2.dtd");
     xpp::new_child(root, nullptr, "node1", "content of node 1");
     xpp::new_child(root, nullptr, "node2");
     auto node3 { xpp::new_child(root, nullptr, "node3",
