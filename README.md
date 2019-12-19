@@ -14,4 +14,3 @@ So, the primary goal here is to create an API where all pointers that should be 
 * This library intends to follow the standard library naming conventions, so the names from libxml2 will be converted from camelCase to snake\_case.
 * The "xml" prefix on identifiers will be dropped in favor of a namespace.
 * Other elements of a function's name should be dropped when overloading makes them unnecessary
-* 
