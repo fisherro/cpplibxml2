@@ -6,3 +6,5 @@ LDFLAGS+=-lxml2
 
 all: tree1 tree2
 
+clean:
+	@rm tree1 tree2
