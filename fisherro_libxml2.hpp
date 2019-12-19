@@ -10,7 +10,7 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
-namespace xpp {
+namespace fisherro::libxml2 {
 
     using doc  = xmlDoc;
     using node = xmlNode;
